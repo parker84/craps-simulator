@@ -199,5 +199,33 @@ plot = (bars).properties(
 ).interactive()
 st.altair_chart(plot, use_container_width=True)
 
+# --------------runs over time
+with st.expander('Simulation Results Per Roll 📉'):
+    results_df = pd.DataFrame([
+        row for row in simulation_results_df['results']
+    ])
+    metrics_of_cumulative_results = results_df.aggregate(['mean', 'median', 'min', 'max', 'std']).T
+    metrics_of_cumulative_results['Roll'] = metrics_of_cumulative_results.index + 1
+    metrics_of_cumulative_results['Average Win / Loss'] = metrics_of_cumulative_results['mean']
+    metrics_of_cumulative_results['upper'] = metrics_of_cumulative_results['mean'] + metrics_of_cumulative_results['std']
+    metrics_of_cumulative_results['lower'] = metrics_of_cumulative_results['mean'] - metrics_of_cumulative_results['std']
+
+    line = alt.Chart(metrics_of_cumulative_results).mark_line().encode(
+        x='Roll',
+        y=alt.Y("Average Win / Loss", axis=alt.Axis(format='$s'))
+    )
+    error_band = alt.Chart(metrics_of_cumulative_results).mark_errorband().encode(
+        x='Roll',
+        y="Average Win / Loss",
+        yError='upper',
+        yError2='lower',
+    )
+    plot = (line + error_band).properties(
+        title="Average Win / Loss Per Roll"
+    ).interactive()
+    st.altair_chart(plot, use_container_width=True)
+    
+
+
 st.markdown('---')
-st.markdown(f'`{millify(games_to_sim)}` games simulated, \n[see github here](https://github.com/parker84/craps-simulator)')
+st.markdown(f'`{millify(games_to_sim)}` games simulated, [see github here](https://github.com/parker84/craps-simulator)')

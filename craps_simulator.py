@@ -40,19 +40,23 @@ class CrapsSimulator():
     def play_game(self):
         game_result = {
             'rolls': [],
+            'results': [],
             'result': 0,
             'stop_loss': self.stop_loss,
             'stop_win': self.stop_win,
             'max_rolls_per_game': self.max_rolls_per_game
         }
+        stop = False
         for roll in range(self.max_rolls_per_game):
             roll_result = self._play_roll()
             game_result['rolls'].append(roll_result)
-            game_result['result'] += roll_result
+            if stop == False:
+                game_result['result'] += roll_result
+            game_result['results'].append(game_result['result'])
             if game_result['result'] <= game_result['stop_loss']:
-                break
+                stop = True
             if game_result['result'] >= game_result['stop_win']:
-                break
+                stop = True
         return game_result
 
     def _play_roll(self):
