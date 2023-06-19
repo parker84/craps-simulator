@@ -206,21 +206,17 @@ with st.expander('Simulation Results Per Roll 📉'):
     ])
     metrics_of_cumulative_results = results_df.aggregate(['mean', 'median', 'min', 'max', 'std']).T
     metrics_of_cumulative_results['Roll'] = metrics_of_cumulative_results.index + 1
-    metrics_of_cumulative_results['Average Win / Loss'] = metrics_of_cumulative_results['mean']
-    metrics_of_cumulative_results['upper'] = metrics_of_cumulative_results['mean'] + metrics_of_cumulative_results['std']
-    metrics_of_cumulative_results['lower'] = metrics_of_cumulative_results['mean'] - metrics_of_cumulative_results['std']
-
+    metrics_of_cumulative_results['Average Win / Loss'] = metrics_of_cumulative_results['mean'].round(2)
     line = alt.Chart(metrics_of_cumulative_results).mark_line().encode(
         x='Roll',
         y=alt.Y("Average Win / Loss", axis=alt.Axis(format='$s'))
     )
     error_band = alt.Chart(metrics_of_cumulative_results).mark_errorband().encode(
         x='Roll',
-        y="Average Win / Loss",
-        yError='upper',
-        yError2='lower',
+        y="mean",
+        yError='std',
     )
-    plot = (line + error_band).properties(
+    plot = (error_band + line).properties(
         title="Average Win / Loss Per Roll"
     ).interactive()
     st.altair_chart(plot, use_container_width=True)
